@@ -48,6 +48,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   nextPotentialWin = 0;
   nextPotentialWinText;
 
+  freeBoxText;
+
   preload() {
     this.loadFont("troika", "assets/troika.otf");
 
@@ -98,9 +100,22 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createPotentialWinText();
 
     this.createNextPotentialWinText();
+
+    this.createFreeBoxText();
   }
 
   update(time, delta) {}
+
+  createFreeBoxText() {
+    this.freeBoxText = this.add.text(250, 800, "FREE BOX!!!", {
+      fontSize: "200px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 30,
+    });
+
+    this.freeBoxText.setAlpha(0);
+  }
 
   createPotentialWinText() {
     this.potentialWinText = this.add.text(600, 2240, "Potential Win", {
@@ -335,19 +350,24 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.moveTruck();
       this.roundFinished();
     } else {
-      this.boxCountText.text = this.boxCount;
-      this.boxGroup[this.boxCount].gameObject.startFollow({
-        duration: 1000,
-        loop: 0,
-        onComplete: () => {
-          this.boxGroup[this.boxCount].gameObject.destroy();
-          this.fillTruckLoadMeter(this.boxGroup[this.boxCount].weight);
-        },
-      });
+      this.LoadNextBox();
     }
   }
 
+  LoadNextBox() {
+    this.boxCountText.text = this.boxCount;
+    this.boxGroup[this.boxCount].gameObject.startFollow({
+      duration: 1000,
+      loop: 0,
+      onComplete: () => {
+        this.boxGroup[this.boxCount].gameObject.destroy();
+        this.fillTruckLoadMeter(this.boxGroup[this.boxCount].weight);
+      },
+    });
+  }
+
   moveTruck() {
+	this.truckLoadText.setAlpha(0);
     this.truck.play("TruckDriving");
     this.truck.startFollow({
       duration: 2000,
@@ -362,7 +382,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   fillTruckLoadMeter(boxWeight) {
     if (boxWeight === 0) {
-      this.startBoxLoading();
+      this.ZeroWeightBoxLoaded();
     }
 
     this.realTruckLoad += boxWeight;
@@ -384,8 +404,18 @@ export default class HelloWorldScene extends Phaser.Scene {
     }
   }
 
+  ZeroWeightBoxLoaded() {
+    this.freeBoxText.setAlpha(1);
+
+    this.time.delayedCall(1000, () => {
+      this.startBoxLoading();
+      this.freeBoxText.setAlpha(0);
+    });
+  }
+
   startTour() {
     if (this.boxCount === 0) return;
+	this.deleteBoxButton.setAlpha(0);
     this.startBoxLoading();
     this.changeBalance(-this.bet);
   }
