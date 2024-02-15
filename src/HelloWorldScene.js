@@ -19,6 +19,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   truck;
   truckCanLerp = false;
   truckLerpStep = 0;
+  truckPath;
 
   box;
   boxPath;
@@ -30,6 +31,9 @@ export default class HelloWorldScene extends Phaser.Scene {
   canUpdateTruckMeter;
 
   boxLoadSequence = [0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
+  multyplierSequece = [
+    1.08, 1.93, 4.14, 11.3, 32.79, 121.95, 250, 1000, 5000, 10000,
+  ];
 
   boxCount = 0;
   boxCountText;
@@ -38,6 +42,11 @@ export default class HelloWorldScene extends Phaser.Scene {
   winAmmount = 0;
   winAmmountText;
 
+  potentialWin = 0;
+  potentialWinText;
+
+  nextPotentialWin = 0;
+  nextPotentialWinText;
 
   preload() {
     this.loadFont("troika", "assets/troika.otf");
@@ -45,7 +54,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.baseURL = "assets/";
 
     this.load.image("BG", "Background.png");
-    this.load.image("UI", "UI.png");
+    this.load.image("UI", "UIV2.png");
     this.load.image("Truck", "Truck.png");
     this.load.image("TourButton", "TourButton.png");
     this.load.image("BuyButton", "BuyButton.png");
@@ -55,11 +64,17 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("ArrowLeft", "ArrowLeft.png");
     this.load.image("ArrowRight", "ArrowRight.png");
     this.load.image("DeleteBoxButton", "DeleteBoxButton.png");
+    this.load.spritesheet("Truck2", "TruckSpritesheet2.png", {
+      frameWidth: 958,
+      frameHeight: 558,
+    });
   }
 
   create() {
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
     this.add.image(0, 3240, "UI").setOrigin(0, 1);
+
+    this.createTruckPath();
 
     this.createTruck();
 
@@ -79,22 +94,67 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createBetButtons();
 
     this.creatDeleteBoxButton();
+
+    this.createPotentialWinText();
+
+    this.createNextPotentialWinText();
   }
 
-  update(time, delta) {
-    // this.StartBoxLoading();
-    this.lerpTruck(delta);
-    if (this.currentTruckLoad < this.realTruckLoad) {
+  update(time, delta) {}
+
+  createPotentialWinText() {
+    this.potentialWinText = this.add.text(600, 2240, "Potential Win", {
+      fontSize: "80px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 15,
+    });
+  }
+
+  createNextPotentialWinText() {
+    this.nextPotentialWinText = this.add.text(600, 2350, "Next Win", {
+      fontSize: "80px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 15,
+    });
+  }
+
+  updateWinText() {
+    if (this.boxGroup.length < 1) {
+      this.potentialWinText.text = `Win: ${0}`;
+
+      this.nextPotentialWin = this.bet * this.multyplierSequece[0];
+      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin}`;
+    } else {
+      this.potentialWin =
+        this.bet * this.multyplierSequece[this.boxGroup.length - 1];
+      this.potentialWinText.text = `Win: ${this.potentialWin}`;
+
+      this.nextPotentialWin =
+        this.bet * this.multyplierSequece[this.boxGroup.length];
+      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin}`;
     }
   }
 
   createBoxPath() {
-    this.graphics = this.add.graphics();
-    this.graphics.lineStyle(10, 0xffffff, 1);
+    // this.graphics = this.add.graphics();
+    // this.graphics.lineStyle(10, 0xffffff, 1);
+
     this.boxPath = new Phaser.Curves.Path(600, 700);
     this.boxPath.lineTo(600, 1600);
 
-    this.boxPath.draw(this.graphics);
+    // this.boxPath.draw(this.graphics);
+  }
+
+  createTruckPath() {
+    // this.graphics = this.add.graphics();
+    // this.graphics.lineStyle(10, 0xffffff, 1);
+
+    this.truckPath = new Phaser.Curves.Path(850, 1600);
+    this.truckPath.lineTo(3000, 1600);
+
+    // this.truckPath.draw(this.graphics);
   }
 
   createUIText() {
@@ -132,7 +192,6 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   changeBet(increase) {
-	if(this.boxCount > 0) return;
     if (increase) {
       this.bet += 10;
       this.betText.text = `${this.bet}`;
@@ -140,10 +199,15 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.bet -= 10;
       this.betText.text = `${this.bet}`;
     }
+    this.updateWinText();
   }
 
   createTruck() {
-    this.truck = this.add.image(850, 1600, "Truck");
+    this.createTruckAnimaiton();
+
+    this.truck = this.add
+      .follower(this.truckPath, 830, 1600, "Truck2")
+      .setScale(1.3, 1.3);
     this.truck.setDepth(5);
     this.truckLoadText = this.add.text(
       370,
@@ -157,6 +221,14 @@ export default class HelloWorldScene extends Phaser.Scene {
       }
     );
     this.truckLoadText.setDepth(6);
+  }
+
+  createTruckAnimaiton() {
+    this.anims.create({
+      key: "TruckDriving",
+      frames: "Truck2",
+      repeat: -1,
+    });
   }
 
   createBoxCountText() {
@@ -206,6 +278,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.spawnBox();
     this.updateBoxCount();
     this.activateActionsForFirstBoughtBox();
+    this.updateWinText();
   }
 
   spawnBox() {
@@ -228,7 +301,6 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   activateActionsForFirstBoughtBox() {
     if (this.boxCount == 1) {
-      this.changeBalance(-this.bet);
       this.deleteBoxButton.setAlpha(1);
     }
   }
@@ -253,14 +325,14 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.boxCountText.text = this.boxCount;
     if (this.boxCount === 0) {
       this.deleteBoxButton.setAlpha(0);
-      this.changeBalance(this.bet);
     }
+    this.updateWinText();
   }
 
   startBoxLoading() {
     this.boxCount--;
     if (this.boxCount <= -1) {
-      this.truckCanLerp = true;
+      this.moveTruck();
       this.roundFinished();
     } else {
       this.boxCountText.text = this.boxCount;
@@ -273,6 +345,19 @@ export default class HelloWorldScene extends Phaser.Scene {
         },
       });
     }
+  }
+
+  moveTruck() {
+    this.truck.play("TruckDriving");
+    this.truck.startFollow({
+      duration: 2000,
+      loop: 0,
+      onComplete: () => {
+        this.showWin();
+        this.truckCanLerp = false;
+        this.truckLerpStep = 0;
+      },
+    });
   }
 
   fillTruckLoadMeter(boxWeight) {
@@ -300,59 +385,13 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   startTour() {
+    if (this.boxCount === 0) return;
     this.startBoxLoading();
-  }
-
-  lerpTruck(delta) {
-    if (!this.truckCanLerp) return;
-
-    this.truckLerpStep += delta / 2500;
-
-    this.truck.x = this.lerp(850, 2500, this.truckLerpStep);
-    this.truckLoadText.x = this.lerp(370, 2020, this.truckLerpStep);
-
-    if (this.truckLerpStep >= 1) {
-      this.showWin();
-      this.truckCanLerp = false;
-      this.truckLerpStep = 0;
-    }
+    this.changeBalance(-this.bet);
   }
 
   showWin() {
-    let multiplier;
-
-    switch (this.boxGroup.length) {
-      case 1:
-        multiplier = 1.08;
-        break;
-      case 2:
-        multiplier = 1.93;
-        break;
-      case 3:
-        multiplier = 4.14;
-        break;
-      case 4:
-        multiplier = 11.3;
-        break;
-      case 5:
-        multiplier = 32.79;
-        break;
-      case 6:
-        multiplier = 121.95;
-        break;
-      case 7:
-        multiplier = 250.0;
-        break;
-      case 8:
-        multiplier = 1000.0;
-        break;
-      case 9:
-        multiplier = 5000.0;
-        break;
-      case 10:
-        multiplier = 10000.0;
-        break;
-    }
+    let multiplier = this.multyplierSequece[this.boxGroup.length - 1];
 
     this.winAmmount = multiplier * this.bet * this.boxGroup.length;
     this.winAmmountText.text = `Win: ${this.winAmmount}`;
