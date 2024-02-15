@@ -56,7 +56,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.baseURL = "assets/";
 
     this.load.image("BG", "Background.png");
-    this.load.image("UI", "UIV2.png");
+    this.load.image("UI", "UIV3.png");
     this.load.image("Truck", "Truck.png");
     this.load.image("TourButton", "TourButton.png");
     this.load.image("BuyButton", "BuyButton.png");
@@ -73,6 +73,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   create() {
+	this.boxLoadSequence.sort();
+
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
     this.add.image(0, 3240, "UI").setOrigin(0, 1);
 
@@ -102,9 +104,20 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createNextPotentialWinText();
 
     this.createFreeBoxText();
+
+	this.createMinMaxBoxWeightText();
   }
 
   update(time, delta) {}
+
+  createMinMaxBoxWeightText() {
+	this.add.text(130, 2430, `${this.boxLoadSequence[0]}-${this.boxLoadSequence[this.boxLoadSequence.length-1]} kg`, {
+		fontSize: "70px",
+		fontFamily: "troika",
+		stroke: "#000000",
+		strokeThickness: 10,
+	  });
+  }
 
   createFreeBoxText() {
     this.freeBoxText = this.add.text(250, 800, "FREE BOX!!!", {
@@ -127,7 +140,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createNextPotentialWinText() {
-    this.nextPotentialWinText = this.add.text(600, 2350, "Next Win", {
+    this.nextPotentialWinText = this.add.text(600, 2350, "Next Box", {
       fontSize: "80px",
       fontFamily: "troika",
       stroke: "#000000",
@@ -144,7 +157,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     } else {
       this.potentialWin =
         this.bet * this.multyplierSequece[this.boxGroup.length - 1];
-      this.potentialWinText.text = `Win: ${this.potentialWin}`;
+      this.potentialWinText.text = `Win: ${this.potentialWin.toFixed(2)}`;
 
       this.nextPotentialWin =
         this.bet * this.multyplierSequece[this.boxGroup.length];
@@ -173,14 +186,14 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createUIText() {
-    this.betText = this.add.text(410, 3000, `${this.bet}`, {
+    this.betText = this.add.text(1070, 3010, `${this.bet}`, {
       fontSize: "90px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 15,
     });
 
-    this.balanceText = this.add.text(1090, 3000, `${this.balance}`, {
+    this.balanceText = this.add.text(300, 3000, `${this.balance}`, {
       fontSize: "90px",
       fontFamily: "troika",
       stroke: "#000000",
@@ -190,7 +203,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   createBetButtons() {
     this.decreaseBetButton = this.add
-      .image(300, 3070, "ArrowLeft")
+      .image(970, 3070, "ArrowLeft")
       .setScale(0.5, 0.5);
     this.decreaseBetButton.setInteractive();
     this.decreaseBetButton.on("pointerdown", () => {
@@ -198,7 +211,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     });
 
     this.increaseBetButton = this.add
-      .image(650, 3070, "ArrowRight")
+      .image(1270, 3070, "ArrowRight")
       .setScale(0.5, 0.5);
     this.increaseBetButton.setInteractive();
     this.increaseBetButton.on("pointerdown", () => {
@@ -269,7 +282,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createBuyButton() {
-    this.buyButton = this.add.image(450, 2750, "BuyButton");
+    this.buyButton = this.add.image(400, 2750, "BuyButton");
     this.buyButton.setInteractive();
     this.buyButton.on("pointerdown", () => {
       this.createBoxButtonPressed();
@@ -277,7 +290,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createTourButton() {
-    this.tourButton = this.add.image(1200, 2750, "TourButton");
+    this.tourButton = this.add.image(1150, 2750, "TourButton");
     this.tourButton.setInteractive();
     this.tourButton.on("pointerdown", () => {
       this.startTour();
@@ -286,7 +299,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   changeBalance(ammount) {
     this.balance += ammount;
-    this.balanceText.text = `${this.balance}`;
+    this.balanceText.text = `${this.balance.toFixed(2)}`;
   }
 
   createBoxButtonPressed() {
