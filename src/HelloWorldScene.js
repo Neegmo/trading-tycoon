@@ -436,7 +436,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   showWin() {
     let multiplier = this.multyplierSequece[this.boxGroup.length - 1];
 
-    this.winAmmount = multiplier * this.bet * this.boxGroup.length;
+    this.winAmmount = multiplier * this.bet;
     this.winAmmountText.text = `Win: ${this.winAmmount}`;
     this.changeBalance(this.winAmmount);
   }
