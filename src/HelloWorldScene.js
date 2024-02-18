@@ -146,6 +146,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 15,
     });
+    this.nextPotentialWinText.setColor("#00ff00")
   }
 
   updateWinText() {
