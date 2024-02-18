@@ -120,13 +120,14 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createFreeBoxText() {
-    this.freeBoxText = this.add.text(250, 800, "FREE BOX!!!", {
+    this.freeBoxText = this.add.text(250, 900, "FREE BOX!!!", {
       fontSize: "200px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 30,
     });
-
+    this.freeBoxText.setColor("#00ff00")
+    this.freeBoxText.setDepth(100);
     this.freeBoxText.setAlpha(0);
   }
 
@@ -154,7 +155,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.potentialWinText.text = `Win: ${0}`;
 
       this.nextPotentialWin = this.bet * this.multyplierSequece[0];
-      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin}`;
+      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(2)}`;
     } else {
       this.potentialWin =
         this.bet * this.multyplierSequece[this.boxGroup.length - 1];
@@ -162,7 +163,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
       this.nextPotentialWin =
         this.bet * this.multyplierSequece[this.boxGroup.length];
-      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin}`;
+      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(2)}`;
     }
   }
 
@@ -194,7 +195,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       strokeThickness: 15,
     });
 
-    this.balanceText = this.add.text(300, 3000, `${this.balance}`, {
+    this.balanceText = this.add.text(300, 3000, `${this.balance.toFixed(2)}`, {
       fontSize: "90px",
       fontFamily: "troika",
       stroke: "#000000",
@@ -402,7 +403,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.realTruckLoad += boxWeight;
     let loadDifference = this.realTruckLoad - this.currentTruckLoad;
     for (let i = 0; i < loadDifference; i++) {
-      this.time.delayedCall(50 * i, () => {
+      this.time.delayedCall(20 * i, () => {
         this.currentTruckLoad++;
 
         this.truckLoadText.text = `${this.currentTruckLoad}/100kg`;
@@ -438,7 +439,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     let multiplier = this.multyplierSequece[this.boxGroup.length - 1];
 
     this.winAmmount = multiplier * this.bet;
-    this.winAmmountText.text = `Win: ${this.winAmmount}`;
+    this.winAmmountText.text = `Win: ${this.winAmmount.toFixed(2)}`;
     this.changeBalance(this.winAmmount);
   }
 
