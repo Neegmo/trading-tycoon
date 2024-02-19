@@ -70,10 +70,14 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 958,
       frameHeight: 558,
     });
+    this.load.spritesheet("BoxSheet", "BoxSheet3.png", {
+      frameWidth: 500,
+      frameHeight: 500,
+    });
   }
 
   create() {
-	this.boxLoadSequence.sort();
+    this.boxLoadSequence.sort();
 
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
     this.add.image(0, 3240, "UI").setOrigin(0, 1);
@@ -105,18 +109,35 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createFreeBoxText();
 
-	this.createMinMaxBoxWeightText();
+    this.createMinMaxBoxWeightText();
+
+    this.createBoxAnimaiton();
   }
 
   update(time, delta) {}
 
   createMinMaxBoxWeightText() {
-	this.add.text(130, 2430, `${this.boxLoadSequence[0]}-${this.boxLoadSequence[this.boxLoadSequence.length-1]} kg`, {
-		fontSize: "70px",
-		fontFamily: "troika",
-		stroke: "#000000",
-		strokeThickness: 10,
-	  });
+    this.add.text(
+      130,
+      2430,
+      `${this.boxLoadSequence[0]}-${
+        this.boxLoadSequence[this.boxLoadSequence.length - 1]
+      } kg`,
+      {
+        fontSize: "70px",
+        fontFamily: "troika",
+        stroke: "#000000",
+        strokeThickness: 10,
+      }
+    );
+  }
+
+  createBoxAnimaiton() {
+    this.anims.create({
+      key: "BoxApear",
+      frames: "BoxSheet",
+      repeat: 0,
+    });
   }
 
   createFreeBoxText() {
@@ -126,7 +147,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 30,
     });
-    this.freeBoxText.setColor("#00ff00")
+    this.freeBoxText.setColor("#00ff00");
     this.freeBoxText.setDepth(100);
     this.freeBoxText.setAlpha(0);
   }
@@ -147,7 +168,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 15,
     });
-    this.nextPotentialWinText.setColor("#00ff00")
+    this.nextPotentialWinText.setColor("#00ff00");
   }
 
   updateWinText() {
@@ -155,7 +176,9 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.potentialWinText.text = `Win: ${0}`;
 
       this.nextPotentialWin = this.bet * this.multyplierSequece[0];
-      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(2)}`;
+      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(
+        2
+      )}`;
     } else {
       this.potentialWin =
         this.bet * this.multyplierSequece[this.boxGroup.length - 1];
@@ -163,7 +186,9 @@ export default class HelloWorldScene extends Phaser.Scene {
 
       this.nextPotentialWin =
         this.bet * this.multyplierSequece[this.boxGroup.length];
-      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(2)}`;
+      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(
+        2
+      )}`;
     }
   }
 
@@ -313,8 +338,10 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   spawnBox() {
     this.box = this.add
-      .follower(this.boxPath, 600, 700, "Box")
+      .follower(this.boxPath, 600, 700, "BoxSheet")
       .setScale(0.7, 0.7);
+
+    this.box.play("BoxApear");
     let loadIndex = Phaser.Math.Between(0, this.boxLoadSequence.length - 1);
     this.boxGroup.push({
       gameObject: this.box,
@@ -382,7 +409,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   moveTruck() {
-	this.truckLoadText.setAlpha(0);
+    this.truckLoadText.setAlpha(0);
     this.truck.play("TruckDriving");
     this.truck.startFollow({
       duration: 2000,
@@ -430,7 +457,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   startTour() {
     if (this.boxCount === 0) return;
-	this.deleteBoxButton.setAlpha(0);
+    this.deleteBoxButton.setAlpha(0);
     this.startBoxLoading();
     this.changeBalance(-this.bet);
   }
