@@ -70,7 +70,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 958,
       frameHeight: 558,
     });
-    this.load.spritesheet("BoxSheet", "BoxSheet3.png", {
+    this.load.spritesheet("BoxSheet", "BoxSheet4.png", {
       frameWidth: 500,
       frameHeight: 500,
     });
