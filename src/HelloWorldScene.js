@@ -114,7 +114,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createBoxAnimaiton();
   }
 
-  update(time, delta) {}
+  update(time, delta) {
+    this.truckLoadText.x = this.truck.x - 300
+    this.truckLoadText.y = this.truck.y - 150
+    
+  }
 
   createMinMaxBoxWeightText() {
     this.add.text(
@@ -153,22 +157,22 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createPotentialWinText() {
-    this.potentialWinText = this.add.text(600, 2240, "Potential Win", {
-      fontSize: "80px",
+    this.potentialWinText = this.add.text(900, 2295, "Potential Win", {
+      fontSize: "70px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 15,
-    });
+    }).setOrigin(0.5, 0.5);
   }
 
   createNextPotentialWinText() {
-    this.nextPotentialWinText = this.add.text(600, 2350, "Next Box", {
-      fontSize: "80px",
+    this.nextPotentialWinText = this.add.text(900, 2410, "Next Box", {
+      fontSize: "70px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 15,
-    });
-    this.nextPotentialWinText.setColor("#00ff00");
+    }).setOrigin(0.5, 0.5);
+    this.nextPotentialWinText.setColor("#39ff14");
   }
 
   updateWinText() {
@@ -213,33 +217,33 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createUIText() {
-    this.betText = this.add.text(1070, 3010, `${this.bet}`, {
+    this.betText = this.add.text(1120, 3065, `${this.bet}`, {
       fontSize: "90px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 15,
-    });
+    }).setOrigin(0.5, 0.5);
 
-    this.balanceText = this.add.text(300, 3000, `${this.balance.toFixed(2)}`, {
+    this.balanceText = this.add.text(390, 3065, `${this.balance.toFixed(2)}`, {
       fontSize: "90px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 15,
-    });
+    }).setOrigin(0.5, 0.5);
   }
 
   createBetButtons() {
     this.decreaseBetButton = this.add
-      .image(970, 3070, "ArrowLeft")
-      .setScale(0.5, 0.5);
+      .image(940, 3070, "ArrowLeft")
+      .setScale(0.4, 0.4);
     this.decreaseBetButton.setInteractive();
     this.decreaseBetButton.on("pointerdown", () => {
       this.changeBet(false);
     });
 
     this.increaseBetButton = this.add
-      .image(1270, 3070, "ArrowRight")
-      .setScale(0.5, 0.5);
+      .image(1300, 3070, "ArrowRight")
+      .setScale(0.4, 0.4);
     this.increaseBetButton.setInteractive();
     this.increaseBetButton.on("pointerdown", () => {
       this.changeBet(true);
@@ -274,7 +278,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         stroke: "#000000",
         strokeThickness: 15,
       }
-    );
+    ).setOrigin(0.5, 0.5);
     this.truckLoadText.setDepth(6);
   }
 
@@ -389,7 +393,10 @@ export default class HelloWorldScene extends Phaser.Scene {
   startBoxLoading() {
     this.boxCount--;
     if (this.boxCount <= -1) {
-      this.moveTruck();
+      this.time.delayedCall(600, () => {
+        
+        this.moveTruck();
+      });
       this.roundFinished();
     } else {
       this.LoadNextBox();
@@ -409,7 +416,6 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   moveTruck() {
-    this.truckLoadText.setAlpha(0);
     this.truck.play("TruckDriving");
     this.truck.startFollow({
       duration: 2000,
@@ -440,7 +446,10 @@ export default class HelloWorldScene extends Phaser.Scene {
         }
 
         if (i === loadDifference - 1) {
-          this.startBoxLoading();
+          this.time.delayedCall(500, () => {
+
+            this.startBoxLoading();
+          })
         }
       });
     }
