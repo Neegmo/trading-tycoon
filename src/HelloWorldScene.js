@@ -31,6 +31,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   canUpdateTruckMeter;
 
   boxLoadSequence = [0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
+  // boxLoadSequence = [0, 0];
   multyplierSequece = [
     1.08, 1.93, 4.14, 11.3, 32.79, 121.95, 250, 1000, 5000, 10000,
   ];
@@ -158,7 +159,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   createPotentialWinText() {
     this.potentialWinText = this.add.text(900, 2295, "Potential Win", {
-      fontSize: "70px",
+      fontSize: "75px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 15,
@@ -167,7 +168,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   createNextPotentialWinText() {
     this.nextPotentialWinText = this.add.text(900, 2410, "Next Box", {
-      fontSize: "70px",
+      fontSize: "75px",
       fontFamily: "troika",
       stroke: "#000000",
       strokeThickness: 15,
@@ -325,6 +326,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.tourButton.setInteractive();
     this.tourButton.on("pointerdown", () => {
       this.startTour();
+      this.tourButton.disableInteractive()
     });
   }
 
@@ -395,11 +397,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     if (this.boxCount <= -1) {
       this.time.delayedCall(600, () => {
         
-        this.moveTruck();
+        if(this.currentTruckLoad <= 100) this.moveTruck();
       });
       this.roundFinished();
     } else {
-      this.LoadNextBox();
+      if(this.currentTruckLoad <= 100) this.LoadNextBox();
     }
   }
 
@@ -409,8 +411,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       duration: 1000,
       loop: 0,
       onComplete: () => {
+        this.time.delayedCall(100, () => {
+          this.fillTruckLoadMeter(this.boxGroup[this.boxCount].weight);
+        })
         this.boxGroup[this.boxCount].gameObject.destroy();
-        this.fillTruckLoadMeter(this.boxGroup[this.boxCount].weight);
       },
     });
   }
@@ -441,12 +445,23 @@ export default class HelloWorldScene extends Phaser.Scene {
 
         this.truckLoadText.text = `${this.currentTruckLoad}/100kg`;
 
-        if (this.currentTruckLoad > 100) {
-          this.roundFinished();
-        }
 
         if (i === loadDifference - 1) {
+          if(this.currentTruckLoad > 100) {
+            this.roundFinished();
+            this.truckLoadText.setColor("#ff0000")
+            this.truckLoadText.setScale(1.1, 1.1)
+          } 
+          else
+          {
+            this.truckLoadText.setColor("#00ff00")
+            this.truckLoadText.setScale(1.1, 1.1)
+
+          } 
+
           this.time.delayedCall(500, () => {
+            this.truckLoadText.setColor("#ffffff")
+            this.truckLoadText.setScale(1, 1)
 
             this.startBoxLoading();
           })
@@ -457,8 +472,11 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   ZeroWeightBoxLoaded() {
     this.freeBoxText.setAlpha(1);
-
+    this.truckLoadText.setColor("#00ff00")
+    this.truckLoadText.setScale(1.2, 1.2)
     this.time.delayedCall(1000, () => {
+    this.truckLoadText.setColor("#ffffff")
+    this.truckLoadText.setScale(1, 1)
       this.startBoxLoading();
       this.freeBoxText.setAlpha(0);
     });
@@ -523,6 +541,9 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.truckLoadText.text = "0/100kg";
 
     this.boxLoadSequence = [0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
+    // this.boxLoadSequence = [0, 0];
+
+
 
     this.boxCount = 0;
 
