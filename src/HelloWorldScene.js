@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { GUI } from "dat.gui";
+
 export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
     super("hello-world");
@@ -36,6 +37,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     1.08, 1.93, 4.14, 11.3, 32.79, 121.95, 250, 1000, 5000, 10000,
   ];
 
+  winChanceSequence = [ 92.47, 52.74, 23.83, 8.86, 3.18, 0.97, 0.28, 0.05, 0.02, 0.01 ]
+
   boxCount = 0;
   boxCountText;
   deleteBoxButton;
@@ -52,8 +55,6 @@ export default class HelloWorldScene extends Phaser.Scene {
   freeBoxText;
 
   BGMusic;
-
-  gui = new GUI();
 
   preload() {
     this.loadFont("troika", "assets/troika.otf");
@@ -85,8 +86,9 @@ export default class HelloWorldScene extends Phaser.Scene {
   create() {
     this.boxLoadSequence.sort();
 
-    this.BGMusic = this.sound.add("BGMusic")
-    this.BGMusic.loop = true;
+    this.BGMusic = this.sound.add("BGMusic", {loop: true, volume: 0.1})
+    // this.BGMusic.loop = true;
+    // this.BGMusic.volume = 0.1;
     this.BGMusic.play();
 
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
@@ -121,11 +123,12 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createMinMaxBoxWeightText();
 
-    this.createBoxAnimaiton();
+    this.createBoxAnimation();
 
-    this.gui.add(this.BGMusic, "volume", 0, 1, 0.01);
   }
 
+  
+  
   update(time, delta) {
     this.truckLoadText.x = this.truck.x - 300
     this.truckLoadText.y = this.truck.y - 150
@@ -148,7 +151,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     );
   }
 
-  createBoxAnimaiton() {
+  createBoxAnimation() {
     this.anims.create({
       key: "BoxApear",
       frames: "BoxSheet",
@@ -184,27 +187,26 @@ export default class HelloWorldScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 15,
     }).setOrigin(0.5, 0.5);
-    this.nextPotentialWinText.setColor("#39ff14");
+    // this.nextPotentialWinText.setColor("#39ff14");
   }
 
   updateWinText() {
     if (this.boxGroup.length < 1) {
       this.potentialWinText.text = `Win: ${0}`;
 
-      this.nextPotentialWin = this.bet * this.multyplierSequece[0];
-      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(
+      this.nextPotentialWin = this.winChanceSequence[this.boxCount - 1]
+      this.nextPotentialWinText.text = `Chance to Win: ${this.nextPotentialWin.toFixed(
         2
-      )}`;
+      )}%`;
     } else {
       this.potentialWin =
         this.bet * this.multyplierSequece[this.boxGroup.length - 1];
       this.potentialWinText.text = `Win: ${this.potentialWin.toFixed(2)}`;
 
-      this.nextPotentialWin =
-        this.bet * this.multyplierSequece[this.boxGroup.length];
-      this.nextPotentialWinText.text = `Next Win: ${this.nextPotentialWin.toFixed(
+      this.nextPotentialWin = this.winChanceSequence[this.boxCount - 1]
+      this.nextPotentialWinText.text = `Chance to Win: ${this.nextPotentialWin.toFixed(
         2
-      )}`;
+      )}%`;
     }
   }
 
@@ -247,18 +249,42 @@ export default class HelloWorldScene extends Phaser.Scene {
   createBetButtons() {
     this.decreaseBetButton = this.add
       .image(940, 3070, "ArrowLeft")
-      .setScale(0.4, 0.4);
     this.decreaseBetButton.setInteractive();
     this.decreaseBetButton.on("pointerdown", () => {
+      this.decreaseBetButton.setAlpha(0.9)
+      this.decreaseBetButton.setScale(0.9, 0.9)
+    });
+
+    this.decreaseBetButton.on("pointerout", () => {
+      this.decreaseBetButton.setAlpha(1);
+      this.decreaseBetButton.setScale(1, 1)
+    })
+
+    this.decreaseBetButton.on("pointerup", () => {
       this.changeBet(false);
+
+      this.decreaseBetButton.setAlpha(1)
+      this.decreaseBetButton.setScale(1, 1)
     });
 
     this.increaseBetButton = this.add
       .image(1300, 3070, "ArrowRight")
-      .setScale(0.4, 0.4);
     this.increaseBetButton.setInteractive();
     this.increaseBetButton.on("pointerdown", () => {
+      this.increaseBetButton.setAlpha(0.9)
+      this.increaseBetButton.setScale(0.9, 0.9)
+    });
+
+    this.increaseBetButton.on("pointerout", () => {
+      this.increaseBetButton.setAlpha(1);
+      this.increaseBetButton.setScale(1, 1)
+    })
+
+    this.increaseBetButton.on("pointerup", () => {
       this.changeBet(true);
+
+      this.increaseBetButton.setAlpha(1)
+      this.increaseBetButton.setScale(1, 1)
     });
   }
 
@@ -266,7 +292,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     if (increase) {
       this.bet += 10;
       this.betText.text = `${this.bet}`;
-    } else {
+    } else if(this.bet > 10) {
       this.bet -= 10;
       this.betText.text = `${this.bet}`;
     }
@@ -327,18 +353,51 @@ export default class HelloWorldScene extends Phaser.Scene {
   createBuyButton() {
     this.buyButton = this.add.image(400, 2750, "BuyButton");
     this.buyButton.setInteractive();
+
+
     this.buyButton.on("pointerdown", () => {
+      this.buyButton.setAlpha(0.9)
+      this.buyButton.setScale(0.9, 0.9)
+    });
+
+    this.buyButton.on("pointerout", () => {
+      this.buyButton.setAlpha(1);
+      this.buyButton.setScale(1, 1)
+    })
+
+    this.buyButton.on("pointerup", () => {
       this.createBoxButtonPressed();
+
+      this.buyButton.setAlpha(1)
+      this.buyButton.setScale(1, 1)
     });
   }
 
   createTourButton() {
     this.tourButton = this.add.image(1150, 2750, "TourButton");
-    this.tourButton.setInteractive();
+    // this.tourButton.setInteractive();
+    this.tourButton.setAlpha(0.2);
+
+    
+
     this.tourButton.on("pointerdown", () => {
+      this.tourButton.setAlpha(0.9);
+      this.tourButton.setScale(0.9, 0.9);
+
+    });
+
+    this.tourButton.on("pointerout", () => {
+      this.tourButton.setAlpha(1);
+      this.tourButton.setScale(1, 1)
+    })
+
+    this.tourButton.on("pointerup", () => {
+      this.tourButton.setAlpha(1);
+      this.tourButton.setScale(1, 1);
+
       this.startTour();
       this.tourButton.disableInteractive()
-    });
+    })
   }
 
   changeBalance(ammount) {
@@ -347,6 +406,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createBoxButtonPressed() {
+    if(this.boxCount === 10) return
     this.spawnBox();
     this.updateBoxCount();
     this.activateActionsForFirstBoughtBox();
@@ -376,6 +436,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   activateActionsForFirstBoughtBox() {
     if (this.boxCount == 1) {
       this.deleteBoxButton.setAlpha(1);
+      this.tourButton.setInteractive();
+      this.tourButton.setAlpha(1);
     }
   }
 
@@ -384,9 +446,24 @@ export default class HelloWorldScene extends Phaser.Scene {
       .image(770, 550, "DeleteBoxButton")
       .setScale(2, 2);
     this.deleteBoxButton.setInteractive();
+
     this.deleteBoxButton.on("pointerdown", () => {
+      this.deleteBoxButton.setAlpha(0.9);
+      this.deleteBoxButton.setScale(1.8, 1.8)
+    });
+
+    this.deleteBoxButton.on("pointerout", () => {
+      this.deleteBoxButton.setAlpha(1);
+      this.deleteBoxButton.setScale(2, 2)
+    })
+
+    this.deleteBoxButton.on("pointerup", () => {
+      this.deleteBoxButton.setAlpha(1);
+      this.deleteBoxButton.setScale(2, 2)
+      
       this.deleteBox();
     });
+
     this.deleteBoxButton.setDepth(8);
 
     this.deleteBoxButton.setAlpha(0);
@@ -399,6 +476,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.boxCountText.text = this.boxCount;
     if (this.boxCount === 0) {
       this.deleteBoxButton.setAlpha(0);
+      this.tourButton.disableInteractive();
+      this.tourButton.setAlpha(0.2);
     }
     this.updateWinText();
   }
