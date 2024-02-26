@@ -56,6 +56,9 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   BGMusic;
 
+  gui = new GUI();
+  guiMusic;
+
   preload() {
     this.loadFont("troika", "assets/troika.otf");
 
@@ -65,7 +68,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("UI", "UIV3.png");
     this.load.image("Truck", "Truck.png");
     this.load.image("TourButton", "TourButton.png");
-    this.load.image("BuyButton", "BuyButton.png");
+    this.load.image("BuyButton", "BuyButtonV3.png");
     this.load.image("Box", "Box.png");
     this.load.image("Success", "Success.png");
     this.load.image("Overloaded", "Overloaded.png");
@@ -124,6 +127,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createMinMaxBoxWeightText();
 
     this.createBoxAnimation();
+
+    this.guiMusic = this.gui.add(this.BGMusic, "volume", 0, 1, 0.01)
 
   }
 
@@ -601,6 +606,9 @@ export default class HelloWorldScene extends Phaser.Scene {
 
         this.time.delayedCall(4000, () => {
           this.scene.restart();
+          this.BGMusic.stop();
+          // this.guiMusic.remove();
+          this.gui.remove(this.guiMusic);
         });
       });
     } else {
