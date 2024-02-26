@@ -51,6 +51,8 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   freeBoxText;
 
+  BGMusic;
+
   preload() {
     this.loadFont("troika", "assets/troika.otf");
 
@@ -75,10 +77,15 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 500,
       frameHeight: 500,
     });
+    this.load.audio("BGMusic", ["TradingTycoonBGMusic.mp3"])
   }
 
   create() {
     this.boxLoadSequence.sort();
+
+    this.BGMusic = this.sound.add("BGMusic")
+    this.BGMusic.loop = true;
+    this.BGMusic.play();
 
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
     this.add.image(0, 3240, "UI").setOrigin(0, 1);
