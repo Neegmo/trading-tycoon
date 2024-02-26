@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-
+import { GUI } from "dat.gui";
 export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
     super("hello-world");
@@ -52,6 +52,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   freeBoxText;
 
   BGMusic;
+
+  gui = new GUI();
 
   preload() {
     this.loadFont("troika", "assets/troika.otf");
@@ -120,6 +122,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.createMinMaxBoxWeightText();
 
     this.createBoxAnimaiton();
+
+    this.gui.add(this.BGMusic, "volume", 0, 1);
   }
 
   update(time, delta) {
