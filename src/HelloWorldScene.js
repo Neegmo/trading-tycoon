@@ -123,7 +123,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createBoxAnimaiton();
 
-    this.gui.add(this.BGMusic, "volume", 0, 1);
+    this.gui.add(this.BGMusic, "volume", 0, 1, 0.01);
   }
 
   update(time, delta) {
