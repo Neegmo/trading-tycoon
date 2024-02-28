@@ -37,7 +37,9 @@ export default class HelloWorldScene extends Phaser.Scene {
     1.08, 1.93, 4.14, 11.3, 32.79, 121.95, 250, 1000, 5000, 10000,
   ];
 
-  winChanceSequence = [ 92.47, 52.74, 23.83, 8.86, 3.18, 0.97, 0.28, 0.05, 0.02, 0.01 ]
+  winChanceSequence = [
+    92.47, 52.74, 23.83, 8.86, 3.18, 0.97, 0.28, 0.05, 0.02, 0.01,
+  ];
 
   boxCount = 0;
   boxCountText;
@@ -55,6 +57,8 @@ export default class HelloWorldScene extends Phaser.Scene {
   freeBoxText;
 
   BGMusic;
+
+  playTutorial = true;
 
   gui = new GUI();
   guiMusic;
@@ -75,6 +79,12 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("ArrowLeft", "ArrowLeft.png");
     this.load.image("ArrowRight", "ArrowRight.png");
     this.load.image("DeleteBoxButton", "DeleteBoxButton.png");
+    this.load.image("TutorialBG", "TutorialBG.png");
+    this.load.image("TutorialBG2", "TutorialBG2.png");
+    this.load.image("TutorialBG3", "TutorialBG3.png");
+    this.load.image("SecondTutorialGraphic", "SecondTutorialGraphic.png");
+
+
     this.load.spritesheet("Truck2", "TruckSpritesheet2.png", {
       frameWidth: 958,
       frameHeight: 558,
@@ -83,20 +93,19 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 500,
       frameHeight: 500,
     });
-    this.load.audio("BGMusic", ["TradingTycoonBGMusic.mp3"])
-
-    
+    this.load.audio("BGMusic", ["TradingTycoonBGMusic.mp3"]);
   }
 
   create() {
     this.boxLoadSequence.sort();
 
+    if(this.playTutorial) this.createTutorial();
+
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
     this.add.image(0, 3240, "UI").setOrigin(0, 1);
 
-    
-    if(!this.BGMusic || !this.BGMusic.isPlaying) {
-      this.BGMusic = this.sound.add("BGMusic", {loop: true, volume: 0.1})
+    if (!this.BGMusic || !this.BGMusic.isPlaying) {
+      this.BGMusic = this.sound.add("BGMusic", { loop: true, volume: 0.1 });
       this.BGMusic.play();
     }
 
@@ -131,16 +140,194 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createBoxAnimation();
 
-    this.guiMusic = this.gui.add(this.BGMusic, "volume", 0, 1, 0.01)
+    // this.guiMusic = this.gui.add(this.BGMusic, "volume", 0, 1, 0.01)
+  }
+
+  update(time, delta) {
+    this.truckLoadText.x = this.truck.x - 300;
+    this.truckLoadText.y = this.truck.y - 150;
+  }
+
+  createTutorial() {
+    this.createFirstTutorialScreen();
+  }
+
+  createFirstTutorialScreen() {
+    this.tutorialBG = this.add.image(0, 0, "TutorialBG").setDepth(30).setOrigin(0, 0)
+    this.firstTutorialButton = this.add.image(400, 2750, "BuyButton").setDepth(31);
+    this.firstTutorialButton.setInteractive();
+
+    this.firstTutorialButton.on("pointerdown", () => {
+      this.firstTutorialButton.setAlpha(0.9);
+      this.firstTutorialButton.setScale(0.9, 0.9);
+    });
+
+    this.firstTutorialButton.on("pointerout", () => {
+      this.firstTutorialButton.setAlpha(1);
+      this.firstTutorialButton.setScale(1, 1);
+    });
+
+    this.firstTutorialButton.on("pointerup", () => {
+      this.firstTutorialButton.destroy()
+      this.firstTutorialArrow.destroy()
+      this.firstTutorialText.destroy()
+
+      this.createSecondTutorialScreen()
+
+      this.firstTutorialButton.setAlpha(1);
+      this.firstTutorialButton.setScale(1, 1);
+    });
+
+    this.firstTutorialArrow = this.add.sprite(370, 2400, "ArrowRight").setDepth(31).setScale(3, 3).setRotation(Math.PI /2 )
+
+    // this.firstTutorialTween = this.add.tween(this.firstTutorialArrow)
+    // this.firstTutorialTween
+
+    let text = "Click the button\n to add a box"
+    this.firstTutorialText = this.add.text(810, 1300, text, {
+      fontSize: "170px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 30,
+      align: "center"
+    }).setOrigin(0.5, 0.5).setDepth(31);
+
+
 
   }
 
-  
-  
-  update(time, delta) {
-    this.truckLoadText.x = this.truck.x - 300
-    this.truckLoadText.y = this.truck.y - 150
-    
+  createSecondTutorialScreen() {
+    this.tutorialBG.setTexture("TutorialBG2")
+    this.tutorialBG.setInteractive()
+    this.tutorialBG.once('pointerup', () => {
+      this.secondTutorualArrow1.destroy()
+      this.secondTutorualArrow2.destroy()
+      this.secondTutorialText.destroy()
+
+      this.createThirdTutorialScreen()
+    })
+    this.secondTutorualArrow1 = this.add.image(1500, 2300, "ArrowLeft").setDepth(31).setScale(1.2, 1.2)
+    this.secondTutorualArrow2 = this.add.image(1500, 2400, "ArrowLeft").setDepth(31).setScale(1.2, 1.2)
+
+    let text = "Each box\n encreases Win\nBut\nDecreases chance"
+    this.secondTutorialText = this.add.text(810, 1300, text, {
+      fontSize: "170px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 30,
+      align: "center"
+    }).setOrigin(0.5, 0.5).setDepth(31);
+  }
+
+  createThirdTutorialScreen() {
+    this.tutorialBG.setTexture("TutorialBG3")
+    this.tutorialBG.setInteractive()
+    this.tutorialBG.once('pointerup', () => {
+      this.thirdTutorialText.destroy()
+      this.createFourthTutorialScreen()
+    })
+
+    let text = "Each box weights\n 0 to 120 kg.\nBe careful\n not to overfill the truck"
+    this.thirdTutorialText = this.add.text(810, 700, text, {
+      fontSize: "120px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 30,
+      align: "center"
+    }).setOrigin(0.5, 0.5).setDepth(31);
+
+  }
+
+  createFourthTutorialScreen() {
+    this.tutorialBG.setTexture("TutorialBG")
+
+    this.fourthTutorialBox = this.add.image(600, 700, "Box")
+    .setScale(0.7, 0.7).setDepth(31);
+    this.fourthTutorialBoxCountText = this.add.text(850, 450, "1", {
+      fontSize: "90px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 15,
+    }).setDepth(31);
+
+    let text = "You can\nalways delete\nUnvanted boxes"
+    this.fourthTutorialText = this.add.text(810, 1300, text, {
+      fontSize: "170px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 30,
+      align: "center"
+    }).setOrigin(0.5, 0.5).setDepth(31);
+
+    this.fourthTutorialArrow = this.add.sprite(770, 350, "ArrowRight").setDepth(31).setScale(2, 2).setRotation(Math.PI /2 )
+
+    this.fourthTutorialDeleteBoxButton = this.add
+      .image(770, 550, "DeleteBoxButton")
+      .setScale(2, 2)
+      .setDepth(31);
+    this.fourthTutorialDeleteBoxButton.setInteractive();
+
+    this.fourthTutorialDeleteBoxButton.on("pointerdown", () => {
+      this.fourthTutorialDeleteBoxButton.setAlpha(0.9);
+      this.fourthTutorialDeleteBoxButton.setScale(1.8, 1.8);
+    });
+
+    this.fourthTutorialDeleteBoxButton.on("pointerout", () => {
+      this.fourthTutorialDeleteBoxButton.setAlpha(1);
+      this.fourthTutorialDeleteBoxButton.setScale(2, 2);
+    });
+
+    this.fourthTutorialDeleteBoxButton.on("pointerup", () => {
+      this.fourthTutorialDeleteBoxButton.setAlpha(1);
+      this.fourthTutorialDeleteBoxButton.setScale(2, 2);
+
+      this.fourthTutorialBox.destroy()
+      this.fourthTutorialBoxCountText.destroy()
+      this.fourthTutorialDeleteBoxButton.destroy()
+      this.fourthTutorialText.destroy()
+      this.fourthTutorialArrow.destroy()
+
+      this.createFifthTutorialScreen()
+    });
+  }
+
+  createFifthTutorialScreen() {
+    this.tutorialBG.setInteractive()
+
+    this.fifthTutorialButton = this.add.image(1150, 2750, "TourButton").setDepth(31);
+    this.fifthTutorialButton.setInteractive()
+
+    this.fifthTutorialButton.on("pointerdown", () => {
+      this.fifthTutorialButton.setAlpha(0.9);
+      this.fifthTutorialButton.setScale(0.9, 0.9);
+    });
+
+    this.fifthTutorialButton.on("pointerout", () => {
+      this.fifthTutorialButton.setAlpha(1);
+      this.fifthTutorialButton.setScale(1, 1);
+    });
+
+    this.fifthTutorialButton.on("pointerup", () => {
+      this.fifthTutorialButton.setAlpha(1);
+      this.fifthTutorialButton.setScale(1, 1);
+
+      this.tutorialBG.destroy()
+      this.fifthTutorialButton.destroy()
+      this.fifthTutorialText.destroy()
+      this.fifthTutorialArrow.destroy()
+      this.playTutorial = false
+    });
+
+    let text = "Start the tour\nto test your Luck!"
+    this.fifthTutorialText = this.add.text(810, 1300, text, {
+      fontSize: "170px",
+      fontFamily: "troika",
+      stroke: "#000000",
+      strokeThickness: 30,
+      align: "center"
+    }).setOrigin(0.5, 0.5).setDepth(31);
+
+    this.fifthTutorialArrow = this.add.sprite(1140, 2400, "ArrowRight").setDepth(31).setScale(3, 3).setRotation(Math.PI /2 )
   }
 
   createMinMaxBoxWeightText() {
@@ -180,22 +367,26 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createPotentialWinText() {
-    this.potentialWinText = this.add.text(900, 2295, "Potential Win", {
-      fontSize: "75px",
-      fontFamily: "troika",
-      stroke: "#000000",
-      strokeThickness: 15,
-    }).setOrigin(0.5, 0.5);
-    this.potentialWinText.setColor("#FAC427")
+    this.potentialWinText = this.add
+      .text(900, 2295, "Potential Win", {
+        fontSize: "75px",
+        fontFamily: "troika",
+        stroke: "#000000",
+        strokeThickness: 15,
+      })
+      .setOrigin(0.5, 0.5);
+    this.potentialWinText.setColor("#FAC427");
   }
 
   createNextPotentialWinText() {
-    this.nextPotentialWinText = this.add.text(900, 2410, "Next Box", {
-      fontSize: "75px",
-      fontFamily: "troika",
-      stroke: "#000000",
-      strokeThickness: 15,
-    }).setOrigin(0.5, 0.5);
+    this.nextPotentialWinText = this.add
+      .text(900, 2410, "Next Box", {
+        fontSize: "75px",
+        fontFamily: "troika",
+        stroke: "#000000",
+        strokeThickness: 15,
+      })
+      .setOrigin(0.5, 0.5);
     this.nextPotentialWinText.setColor("#D0E0D0");
   }
 
@@ -203,7 +394,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     if (this.boxGroup.length < 1) {
       this.potentialWinText.text = `Win: ${0}`;
 
-      this.nextPotentialWin = this.winChanceSequence[this.boxCount - 1]
+      this.nextPotentialWin = this.winChanceSequence[this.boxCount - 1];
       this.nextPotentialWinText.text = `Chance to Win: ${this.nextPotentialWin.toFixed(
         2
       )}%`;
@@ -212,7 +403,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.bet * this.multyplierSequece[this.boxGroup.length - 1];
       this.potentialWinText.text = `Win: ${this.potentialWin.toFixed(2)}`;
 
-      this.nextPotentialWin = this.winChanceSequence[this.boxCount - 1]
+      this.nextPotentialWin = this.winChanceSequence[this.boxCount - 1];
       this.nextPotentialWinText.text = `Chance to Win: ${this.nextPotentialWin.toFixed(
         2
       )}%`;
@@ -240,60 +431,62 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createUIText() {
-    this.betText = this.add.text(1120, 3065, `${this.bet}`, {
-      fontSize: "90px",
-      fontFamily: "troika",
-      stroke: "#000000",
-      strokeThickness: 15,
-    }).setOrigin(0.5, 0.5);
+    this.betText = this.add
+      .text(1120, 3065, `${this.bet}`, {
+        fontSize: "90px",
+        fontFamily: "troika",
+        stroke: "#000000",
+        strokeThickness: 15,
+      })
+      .setOrigin(0.5, 0.5);
 
-    this.balanceText = this.add.text(390, 3065, `${this.balance.toFixed(2)}`, {
-      fontSize: "90px",
-      fontFamily: "troika",
-      stroke: "#000000",
-      strokeThickness: 15,
-    }).setOrigin(0.5, 0.5);
+    this.balanceText = this.add
+      .text(390, 3065, `${this.balance.toFixed(2)}`, {
+        fontSize: "90px",
+        fontFamily: "troika",
+        stroke: "#000000",
+        strokeThickness: 15,
+      })
+      .setOrigin(0.5, 0.5);
   }
 
   createBetButtons() {
-    this.decreaseBetButton = this.add
-      .image(940, 3070, "ArrowLeft")
+    this.decreaseBetButton = this.add.image(940, 3070, "ArrowLeft");
     this.decreaseBetButton.setInteractive();
     this.decreaseBetButton.on("pointerdown", () => {
-      this.decreaseBetButton.setAlpha(0.9)
-      this.decreaseBetButton.setScale(0.9, 0.9)
+      this.decreaseBetButton.setAlpha(0.9);
+      this.decreaseBetButton.setScale(0.9, 0.9);
     });
 
     this.decreaseBetButton.on("pointerout", () => {
       this.decreaseBetButton.setAlpha(1);
-      this.decreaseBetButton.setScale(1, 1)
-    })
+      this.decreaseBetButton.setScale(1, 1);
+    });
 
     this.decreaseBetButton.on("pointerup", () => {
       this.changeBet(false);
 
-      this.decreaseBetButton.setAlpha(1)
-      this.decreaseBetButton.setScale(1, 1)
+      this.decreaseBetButton.setAlpha(1);
+      this.decreaseBetButton.setScale(1, 1);
     });
 
-    this.increaseBetButton = this.add
-      .image(1300, 3070, "ArrowRight")
+    this.increaseBetButton = this.add.image(1300, 3070, "ArrowRight");
     this.increaseBetButton.setInteractive();
     this.increaseBetButton.on("pointerdown", () => {
-      this.increaseBetButton.setAlpha(0.9)
-      this.increaseBetButton.setScale(0.9, 0.9)
+      this.increaseBetButton.setAlpha(0.9);
+      this.increaseBetButton.setScale(0.9, 0.9);
     });
 
     this.increaseBetButton.on("pointerout", () => {
       this.increaseBetButton.setAlpha(1);
-      this.increaseBetButton.setScale(1, 1)
-    })
+      this.increaseBetButton.setScale(1, 1);
+    });
 
     this.increaseBetButton.on("pointerup", () => {
       this.changeBet(true);
 
-      this.increaseBetButton.setAlpha(1)
-      this.increaseBetButton.setScale(1, 1)
+      this.increaseBetButton.setAlpha(1);
+      this.increaseBetButton.setScale(1, 1);
     });
   }
 
@@ -301,7 +494,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     if (increase) {
       this.bet += 10;
       this.betText.text = `${this.bet}`;
-    } else if(this.bet > 10) {
+    } else if (this.bet > 10) {
       this.bet -= 10;
       this.betText.text = `${this.bet}`;
     }
@@ -315,17 +508,14 @@ export default class HelloWorldScene extends Phaser.Scene {
       .follower(this.truckPath, 830, 1600, "Truck2")
       .setScale(1.3, 1.3);
     this.truck.setDepth(5);
-    this.truckLoadText = this.add.text(
-      370,
-      1400,
-      `${this.currentTruckLoad}/10kg`,
-      {
+    this.truckLoadText = this.add
+      .text(370, 1400, `${this.currentTruckLoad}/10kg`, {
         fontSize: "80px",
         fontFamily: "troika",
         stroke: "#000000",
         strokeThickness: 15,
-      }
-    ).setOrigin(0.5, 0.5);
+      })
+      .setOrigin(0.5, 0.5);
     this.truckLoadText.setDepth(6);
   }
 
@@ -363,22 +553,21 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.buyButton = this.add.image(400, 2750, "BuyButton");
     this.buyButton.setInteractive();
 
-
     this.buyButton.on("pointerdown", () => {
-      this.buyButton.setAlpha(0.9)
-      this.buyButton.setScale(0.9, 0.9)
+      this.buyButton.setAlpha(0.9);
+      this.buyButton.setScale(0.9, 0.9);
     });
 
     this.buyButton.on("pointerout", () => {
       this.buyButton.setAlpha(1);
-      this.buyButton.setScale(1, 1)
-    })
+      this.buyButton.setScale(1, 1);
+    });
 
     this.buyButton.on("pointerup", () => {
       this.createBoxButtonPressed();
 
-      this.buyButton.setAlpha(1)
-      this.buyButton.setScale(1, 1)
+      this.buyButton.setAlpha(1);
+      this.buyButton.setScale(1, 1);
     });
   }
 
@@ -387,26 +576,23 @@ export default class HelloWorldScene extends Phaser.Scene {
     // this.tourButton.setInteractive();
     this.tourButton.setAlpha(0.2);
 
-    
-
     this.tourButton.on("pointerdown", () => {
       this.tourButton.setAlpha(0.9);
       this.tourButton.setScale(0.9, 0.9);
-
     });
 
     this.tourButton.on("pointerout", () => {
       this.tourButton.setAlpha(1);
-      this.tourButton.setScale(1, 1)
-    })
+      this.tourButton.setScale(1, 1);
+    });
 
     this.tourButton.on("pointerup", () => {
       this.tourButton.setAlpha(1);
       this.tourButton.setScale(1, 1);
 
       this.startTour();
-      this.tourButton.disableInteractive()
-    })
+      this.tourButton.disableInteractive();
+    });
   }
 
   changeBalance(ammount) {
@@ -415,7 +601,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   createBoxButtonPressed() {
-    if(this.boxCount === 10) return
+    if (this.boxCount === 10) return;
     this.spawnBox();
     this.updateBoxCount();
     this.activateActionsForFirstBoughtBox();
@@ -458,18 +644,18 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.deleteBoxButton.on("pointerdown", () => {
       this.deleteBoxButton.setAlpha(0.9);
-      this.deleteBoxButton.setScale(1.8, 1.8)
+      this.deleteBoxButton.setScale(1.8, 1.8);
     });
 
     this.deleteBoxButton.on("pointerout", () => {
       this.deleteBoxButton.setAlpha(1);
-      this.deleteBoxButton.setScale(2, 2)
-    })
+      this.deleteBoxButton.setScale(2, 2);
+    });
 
     this.deleteBoxButton.on("pointerup", () => {
       this.deleteBoxButton.setAlpha(1);
-      this.deleteBoxButton.setScale(2, 2)
-      
+      this.deleteBoxButton.setScale(2, 2);
+
       this.deleteBox();
     });
 
@@ -495,12 +681,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.boxCount--;
     if (this.boxCount <= -1) {
       this.time.delayedCall(600, () => {
-        
-        if(this.currentTruckLoad <= 100) this.moveTruck();
+        if (this.currentTruckLoad <= 100) this.moveTruck();
       });
       this.roundFinished();
     } else {
-      if(this.currentTruckLoad <= 100) this.LoadNextBox();
+      if (this.currentTruckLoad <= 100) this.LoadNextBox();
     }
   }
 
@@ -512,7 +697,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       onComplete: () => {
         this.time.delayedCall(100, () => {
           this.fillTruckLoadMeter(this.boxGroup[this.boxCount].weight);
-        })
+        });
         this.boxGroup[this.boxCount].gameObject.destroy();
       },
     });
@@ -544,26 +729,22 @@ export default class HelloWorldScene extends Phaser.Scene {
 
         this.truckLoadText.text = `${this.currentTruckLoad}/100kg`;
 
-
         if (i === loadDifference - 1) {
-          if(this.currentTruckLoad > 100) {
+          if (this.currentTruckLoad > 100) {
             this.roundFinished();
-            this.truckLoadText.setColor("#ff0000")
-            this.truckLoadText.setScale(1.1, 1.1)
-          } 
-          else
-          {
-            this.truckLoadText.setColor("#00ff00")
-            this.truckLoadText.setScale(1.1, 1.1)
-
-          } 
+            this.truckLoadText.setColor("#ff0000");
+            this.truckLoadText.setScale(1.1, 1.1);
+          } else {
+            this.truckLoadText.setColor("#00ff00");
+            this.truckLoadText.setScale(1.1, 1.1);
+          }
 
           this.time.delayedCall(500, () => {
-            this.truckLoadText.setColor("#ffffff")
-            this.truckLoadText.setScale(1, 1)
+            this.truckLoadText.setColor("#ffffff");
+            this.truckLoadText.setScale(1, 1);
 
             this.startBoxLoading();
-          })
+          });
         }
       });
     }
@@ -571,11 +752,11 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   ZeroWeightBoxLoaded() {
     this.freeBoxText.setAlpha(1);
-    this.truckLoadText.setColor("#00ff00")
-    this.truckLoadText.setScale(1.2, 1.2)
+    this.truckLoadText.setColor("#00ff00");
+    this.truckLoadText.setScale(1.2, 1.2);
     this.time.delayedCall(1000, () => {
-    this.truckLoadText.setColor("#ffffff")
-    this.truckLoadText.setScale(1, 1)
+      this.truckLoadText.setColor("#ffffff");
+      this.truckLoadText.setScale(1, 1);
       this.startBoxLoading();
       this.freeBoxText.setAlpha(0);
     });
@@ -611,7 +792,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.time.delayedCall(4000, () => {
           this.scene.restart();
           // this.BGMusic.stop();
-          this.gui.remove(this.guiMusic);
+          // this.gui.remove(this.guiMusic);
         });
       });
     } else {
@@ -622,10 +803,9 @@ export default class HelloWorldScene extends Phaser.Scene {
 
       this.time.delayedCall(1500, () => {
         this.scene.restart();
-          // this.BGMusic.stop();
-          this.gui.remove(this.guiMusic);
+        // this.BGMusic.stop();
+        // this.gui.remove(this.guiMusic);
       });
-
     }
   }
 
@@ -645,8 +825,6 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.boxLoadSequence = [0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
     // this.boxLoadSequence = [0, 0];
-
-
 
     this.boxCount = 0;
 
