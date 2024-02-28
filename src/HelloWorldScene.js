@@ -84,18 +84,21 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameHeight: 500,
     });
     this.load.audio("BGMusic", ["TradingTycoonBGMusic.mp3"])
+
+    
   }
 
   create() {
     this.boxLoadSequence.sort();
 
-    this.BGMusic = this.sound.add("BGMusic", {loop: true, volume: 0.1})
-    // this.BGMusic.loop = true;
-    // this.BGMusic.volume = 0.1;
-    this.BGMusic.play();
-
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
     this.add.image(0, 3240, "UI").setOrigin(0, 1);
+
+    
+    if(!this.BGMusic || !this.BGMusic.isPlaying) {
+      this.BGMusic = this.sound.add("BGMusic", {loop: true, volume: 0.1})
+      this.BGMusic.play();
+    }
 
     this.createTruckPath();
 
@@ -183,6 +186,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 15,
     }).setOrigin(0.5, 0.5);
+    this.potentialWinText.setColor("#FAC427")
   }
 
   createNextPotentialWinText() {
@@ -192,7 +196,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       stroke: "#000000",
       strokeThickness: 15,
     }).setOrigin(0.5, 0.5);
-    // this.nextPotentialWinText.setColor("#39ff14");
+    this.nextPotentialWinText.setColor("#D0E0D0");
   }
 
   updateWinText() {
@@ -606,8 +610,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
         this.time.delayedCall(4000, () => {
           this.scene.restart();
-          this.BGMusic.stop();
-          // this.guiMusic.remove();
+          // this.BGMusic.stop();
           this.gui.remove(this.guiMusic);
         });
       });
@@ -619,8 +622,10 @@ export default class HelloWorldScene extends Phaser.Scene {
 
       this.time.delayedCall(1500, () => {
         this.scene.restart();
+          // this.BGMusic.stop();
+          this.gui.remove(this.guiMusic);
       });
-      // this.scene.pause();
+
     }
   }
 
