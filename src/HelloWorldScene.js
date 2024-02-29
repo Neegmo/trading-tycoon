@@ -58,7 +58,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   BGMusic;
 
-  playTutorial = true;
+  playTutorial = false;
 
   gui = new GUI();
   guiMusic;
@@ -68,38 +68,45 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.load.baseURL = "assets/";
 
-    this.load.image("BG", "Background.png");
-    this.load.image("UI", "UIV3.png");
-    this.load.image("Truck", "Truck.png");
-    this.load.image("TourButton", "TourButton.png");
-    this.load.image("BuyButton", "BuyButtonV3.png");
-    this.load.image("Box", "Box.png");
-    this.load.image("Success", "Success.png");
-    this.load.image("Overloaded", "Overloaded.png");
-    this.load.image("ArrowLeft", "ArrowLeft.png");
-    this.load.image("ArrowRight", "ArrowRight.png");
-    this.load.image("DeleteBoxButton", "DeleteBoxButton.png");
-    this.load.image("TutorialBG", "TutorialBG.png");
-    this.load.image("TutorialBG2", "TutorialBG2.png");
-    this.load.image("TutorialBG3", "TutorialBG3.png");
-    this.load.image("SecondTutorialGraphic", "SecondTutorialGraphic.png");
+    this.load.image("BG", "images/Background.png");
+    this.load.image("UI", "images/UIV3.png");
+    this.load.image("Truck", "images/Truck.png");
+    this.load.image("TourButton", "images/TourButton.png");
+    this.load.image("BuyButton", "images/BuyButtonV3.png");
+    this.load.image("Box", "images/Box.png");
+    this.load.image("Success", "images/Success.png");
+    this.load.image("Overloaded", "images/Overloaded.png");
+    this.load.image("ArrowLeft", "images/ArrowLeft.png");
+    this.load.image("ArrowRight", "images/ArrowRight.png");
+    this.load.image("DeleteBoxButton", "images/DeleteBoxButton.png");
+    this.load.image("TutorialBG", "images/TutorialBG.png");
+    this.load.image("TutorialBG2", "images/TutorialBG2.png");
+    this.load.image("TutorialBG3", "images/TutorialBG3.png");
+    this.load.image("SecondTutorialGraphic", "images/SecondTutorialGraphic.png");
 
 
     this.load.spritesheet("Truck2", "TruckSpritesheet2.png", {
       frameWidth: 958,
       frameHeight: 558,
     });
-    this.load.spritesheet("BoxSheet", "BoxSheet4.png", {
+    this.load.spritesheet("BoxSheet", "images/BoxSheet4.png", {
       frameWidth: 500,
       frameHeight: 500,
     });
+
     this.load.audio("BGMusic", ["TradingTycoonBGMusic.mp3"]);
+    this.load.audio("AddBox", ["sounds/AddBox.mp3"]);
+    this.load.audio("Box", ["sounds/Box.mp3"]);
+    this.load.audio("DeleteBox", ["sounds/DeleteBox.mp3"]);
+    this.load.audio("Increment", ["sounds/Increment.mp3"]);
+    this.load.audio("Decrement", ["sounds/Decrement.mp3"]);
+
   }
 
   create() {
     this.boxLoadSequence.sort();
 
-    if(this.playTutorial) this.createTutorial();
+    if(this.playTutorial) this.createFirstTutorialScreen();
 
     this.add.image(-100, -100, "BG").setScale(1.1, 1.1).setOrigin(0, 0);
     this.add.image(0, 3240, "UI").setOrigin(0, 1);
@@ -140,16 +147,32 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.createBoxAnimation();
 
+    this.createSounds()
+
     // this.guiMusic = this.gui.add(this.BGMusic, "volume", 0, 1, 0.01)
+  }
+
+  createSounds() {
+    if(!this.AddBoxSound){
+      this.AddBoxSound = this.sound.add("AddBox")
+    }
+    if(!this.BoxSound){
+      this.BoxSound = this.sound.add("Box")
+    }
+    if(!this.DeleteBoxSound){
+      this.DeleteBoxSound = this.sound.add("DeleteBox")
+    }
+    if(!this.IncrementSound){
+      this.IncrementSound = this.sound.add("Increment")
+    }
+    if(!this.DecrementSound){
+      this.DecrementSound = this.sound.add("Decrement")
+    }
   }
 
   update(time, delta) {
     this.truckLoadText.x = this.truck.x - 300;
     this.truckLoadText.y = this.truck.y - 150;
-  }
-
-  createTutorial() {
-    this.createFirstTutorialScreen();
   }
 
   createFirstTutorialScreen() {
@@ -465,6 +488,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.decreaseBetButton.on("pointerup", () => {
       this.changeBet(false);
+      
 
       this.decreaseBetButton.setAlpha(1);
       this.decreaseBetButton.setScale(1, 1);
@@ -484,6 +508,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.increaseBetButton.on("pointerup", () => {
       this.changeBet(true);
+      
 
       this.increaseBetButton.setAlpha(1);
       this.increaseBetButton.setScale(1, 1);
@@ -494,9 +519,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     if (increase) {
       this.bet += 10;
       this.betText.text = `${this.bet}`;
+      this.IncrementSound.play()
     } else if (this.bet > 10) {
       this.bet -= 10;
       this.betText.text = `${this.bet}`;
+      this.DecrementSound.play()
     }
     this.updateWinText();
   }
@@ -602,6 +629,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   createBoxButtonPressed() {
     if (this.boxCount === 10) return;
+    this.AddBoxSound.play()
     this.spawnBox();
     this.updateBoxCount();
     this.activateActionsForFirstBoughtBox();
@@ -665,6 +693,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   deleteBox() {
+    this.DeleteBoxSound.play()
     this.boxGroup[this.boxGroup.length - 1].gameObject.destroy();
     this.boxGroup.pop();
     this.boxCount--;
@@ -690,6 +719,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   LoadNextBox() {
+    this.BoxSound.play()
     this.boxCountText.text = this.boxCount;
     this.boxGroup[this.boxCount].gameObject.startFollow({
       duration: 1000,
@@ -699,6 +729,7 @@ export default class HelloWorldScene extends Phaser.Scene {
           this.fillTruckLoadMeter(this.boxGroup[this.boxCount].weight);
         });
         this.boxGroup[this.boxCount].gameObject.destroy();
+        
       },
     });
   }
