@@ -935,7 +935,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.truckLoadText.text = "0/100kg";
 
     this.boxLoadSequence = [0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
-    // this.boxLoadSequence = [0, 0];
+    // this.boxLoadSequence = [0, 0]; 
 
     this.boxCount = 0;
 
