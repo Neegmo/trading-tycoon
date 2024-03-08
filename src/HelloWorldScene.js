@@ -58,7 +58,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   BGMusic;
 
-  playTutorial = false;
+  playTutorial = true;
 
   gui = new GUI();
   guiMusic;
@@ -105,10 +105,12 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.audio("AddMoney", ["sounds/AddMoney.mp3"]);
     this.load.audio("BoxFalling", ["sounds/BoxFalling.mp3"]);
     this.load.audio("FreeBox", ["sounds/FreeBox.mp3"]);
+    this.load.audio("FreeBoxV2", ["sounds/FreeBoxV2.mp3"]);
     this.load.audio("IncreaseTruckLoad", ["sounds/IncreaseTruckLoad.mp3"]);
     this.load.audio("Overload", ["sounds/Overload.mp3"]);
     this.load.audio("StartTour", ["sounds/StartTour.mp3"]);
     this.load.audio("Success", ["sounds/Success.mp3"]);
+    this.load.audio("LoadCountingStoped", ["sounds/LoadCountingStoped.mp3"]);
   }
 
   create() {
@@ -195,7 +197,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.SuccessSound = this.sound.add("Success");
     }
     if (!this.FreeBoxSound) {
-      this.FreeBoxSound = this.sound.add("FreeBox");
+      this.FreeBoxSound = this.sound.add("FreeBoxV2");
+    }
+    if (!this.LoadCountingStopedSound) {
+      this.LoadCountingStopedSound = this.sound.add("LoadCountingStoped");
     }
   }
 
@@ -831,6 +836,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   
           if (i === loadDifference - 1) {
             this.IncreaseTruckLoadSound.stop()
+            this.LoadCountingStopedSound.play()
             if (this.currentTruckLoad > 100) {
               this.roundFinished();
               this.truckLoadText.setColor("#ff0000");
@@ -935,6 +941,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.truckLoadText.text = "0/100kg";
 
     this.boxLoadSequence = [0, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
+    // this.boxLoadSequence = [0, 0];
 
     this.boxCount = 0;
 
