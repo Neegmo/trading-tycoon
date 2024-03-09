@@ -18,7 +18,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   buyButton;
 
   truck;
-  truckCanLerp = true;
+  truckCanLerp = false;
   truckLerpStep = 0;
   truckPath;
 
@@ -58,7 +58,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   BGMusic;
 
-  playTutorial = false;
+  playTutorial = true;
 
   gui = new GUI();
   guiMusic;
