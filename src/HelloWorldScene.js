@@ -58,7 +58,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   BGMusic;
 
-  playTutorial = true;
+  playTutorial = false;
 
   gui = new GUI();
   guiMusic;
@@ -301,9 +301,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.thirdTutorialText.destroy();
       this.createFourthTutorialScreen();
     });
-
     let text =
-      "Each box weights\n 0 to 120 kg.\nBe careful\n not to overfill the truck";
+      "Each box weights\n 0 to 110 kg.\nBe careful\n not to overfill the truck";
     this.thirdTutorialText = this.add
       .text(810, 700, text, {
         fontSize: "120px",
@@ -378,6 +377,21 @@ export default class HelloWorldScene extends Phaser.Scene {
 
       this.createFifthTutorialScreen();
     });
+
+    this.tweens.add({
+      targets: this.fourthTutorialDeleteBoxButton,
+      scaleX: 1.1, 
+      scaleY: 1.1, 
+      yoyo: true, 
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      duration: 1000, 
+  });
+                      
+    // this.graphics = this.add.graphics();
+    // this.graphics.setDepth(110)
+    // this.graphics.lineStyle(10, 0xffffff, 1);
+    // this.graphics.strokeCircle(300, 300, 100);
   }
 
   createFifthTutorialScreen() {
@@ -474,6 +488,16 @@ export default class HelloWorldScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0.5);
     this.potentialWinText.setColor("#FAC427");
+
+    this.tweens.add({
+      targets: this.potentialWinText, // The target of the tween is our text object
+      scaleX: 1.1, // Scale the text to twice its size
+      scaleY: 1.1, // Scale the text to twice its size
+      yoyo: true, // This makes the tween reverse automatically, making the text return to its original size
+      repeat: -1, // This makes the tween repeat forever. Set to 0 for no repeats, or a specific number for that many repeats
+      ease: 'Sine.easeInOut', // This defines the easing function for the tween. 'Sine.easeInOut' provides a smooth transition
+      duration: 1000, // The duration of the tween in milliseconds
+  });
   }
 
   createNextPotentialWinText() {
@@ -486,6 +510,16 @@ export default class HelloWorldScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0.5);
     this.nextPotentialWinText.setColor("#D0E0D0");
+
+    this.tweens.add({
+      targets: this.nextPotentialWinText, // The target of the tween is our text object
+      scaleX: 1.1, // Scale the text to twice its size
+      scaleY: 1.1, // Scale the text to twice its size
+      yoyo: true, // This makes the tween reverse automatically, making the text return to its original size
+      repeat: -1, // This makes the tween repeat forever. Set to 0 for no repeats, or a specific number for that many repeats
+      ease: 'Sine.easeInOut', // This defines the easing function for the tween. 'Sine.easeInOut' provides a smooth transition
+      duration: 1000, // The duration of the tween in milliseconds
+  });
   }
 
   updateWinText() {
@@ -782,7 +816,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   startBoxLoading() {
     this.boxCount--;
     if (this.boxCount <= -1) {
-      this.time.delayedCall(600, () => {
+      this.time.delayedCall(1000, () => {
         if (this.currentTruckLoad <= 100) this.moveTruck();
       });
       this.roundFinished();
@@ -864,7 +898,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.freeBoxText.setAlpha(1);
     this.truckLoadText.setColor("#00ff00");
     this.truckLoadText.setScale(1.2, 1.2);
-    this.time.delayedCall(1000, () => {
+    this.time.delayedCall(1500, () => {
       this.truckLoadText.setColor("#ffffff");
       this.truckLoadText.setScale(1, 1);
       this.startBoxLoading();
