@@ -18,7 +18,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   buyButton;
 
   truck;
-  truckCanLerp = false;
+  truckCanLerp = true;
   truckLerpStep = 0;
   truckPath;
 
